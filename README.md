@@ -1,2 +1,2 @@
-# sfg
+# SFG
 SFG - Simple File Generator
