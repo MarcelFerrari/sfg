@@ -19,12 +19,14 @@ or __```sfg --help```__
 
 # Installation
 To install SFG simply download the source code and compile it using clang<br/>
-```$ clang sfg.c```<br/>
-Then rename a.out to __sfg__<br/>
-```$ mv a.out sfg``` <br/>
-And move it to /usr/bin/ for Linux or /usr/local/bin/ for OS X users<br/>
-```$ mv sfg /usr/bin/```<br/>
-or<br/>
-```$ mv sfg /usr/local/bin/```<br/>
+```$ clang sfg.c```<br>
+Then rename a.out to __sfg__<br>
+```$ mv a.out sfg``` <br>
+Make bin executable <br>
+```$ chmod a+x sfg```<br>
+And move it to /usr/bin/ for Linux or /usr/local/bin/ for OS X users<br>
+```$ mv sfg /usr/bin/```<br>
+or<br>
+```$ mv sfg /usr/local/bin/```<br>
 
 ( ͡° ͜ʖ ͡°)
