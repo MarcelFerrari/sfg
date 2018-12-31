@@ -48,7 +48,7 @@ int main (int argc, char *argv[])
       printf("or sfg [path] [size] [unit] --> Writes an empty file named 'file' of size [size][unit] in [path] using kernel default block size\n");
       printf("[size] must be a valid integer\n");
       printf("[unit] must be a valid data size unit (i.e. b, kb, mb, gb)\n");
-      printf("[bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size\n");
+      printf("[bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size. If the input is invalid or 'auto', sfg will use the kernel default bs.\n");
       printf("If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.\n");
       return 0;
     }
