@@ -1,17 +1,3 @@
-/*
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,12 +22,18 @@ int main (int argc, char *argv[])
   // Too few or many arguments
   if (argc != 2 && (argc < 4 || argc > 6))
     {
-      fprintf (stderr, "Usage: sfg path size unit name or sfg --help\n");
+      fprintf (stderr, "Usage: sfg [path] [size] [unit] [bs] [filenamename]\n");
       return 1;
     }
   else if (argc == 2 && strcmp (argv[1], "--help") == 0)
     {
-      printf ("Manpage\n");
+      printf ("Usage: sfg [path] [size] [unit] [bs] [filename] --> Writes an empty file named [name] of size [size][unit] in [path] using block size [bs]\n");
+      printf("or sfg [path] [size] [unit] [bs] --> Writes an empty file named 'file' of size [size][unit] in [path] using block size [bs]\n");
+      printf("or sfg [path] [size] [unit] --> Writes an empty file named 'file' of size [size][unit] in [path] using kernel default block size\n");
+      printf("[size] must be a valid integer\n");
+      printf("[unit] must be a valid data size unit (i.e. b, kb, mb, gb)\n");
+      printf("[bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size\n");
+      printf("If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.\n");
       return 0;
     }
   // Define useful variables
@@ -228,7 +220,7 @@ int rek_mkdir (char *path)
     }
   if (mkdir (path, 0755) && errno != EEXIST)
     {
-      printf("Error while trying to create '%s'! Do i have sufficient permission?\n", path);
+      printf("Error while trying to create '%s'! Do i have sufficient permission?\n Is a '.' missing at the beginning of [path]?", path);
       exit(1);
     }
   return 0;
@@ -277,4 +269,3 @@ char* concat(char* s1, char* s2)
     strcat(result, s2);
     return result;
 }
-/*Copyright © 2018 Marcel Ferrari*/
