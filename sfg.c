@@ -234,9 +234,9 @@ int rek_mkdir (char *path)
       rek_mkdir (path);
       *sep = '/';
     }
-  if (mkdir (path, 0755) && errno != EEXIST)
+  if (mkdir (path, 0777) && errno != EEXIST)
     {
-      printf("Error while trying to create '%s'! Do i have sufficient permission?\n Is a '.' missing at the beginning of [path]?", path);
+      printf("Error while trying to create '%s'! Do i have sufficient permission?\n Is a '.' missing at the beginning of [path]?\n Is '~' at the beginning of [path]?\n", path);
       exit(1);
     }
   return 0;
