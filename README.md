@@ -14,7 +14,7 @@ or __```sfg --help```__
 ## Note:
 * [size] must be a valid integer
 * [unit] must be a valid data size unit (i.e. b, kb, mb, gb)
-* [bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size
+* [bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size. If the input is invalid or 'auto', sfg will use the kernel default bs.
 * If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.
 
 # Installation
