@@ -48,7 +48,7 @@ int main (int argc, char *argv[])
       printf("or sfg [path] [size] [unit] --> Writes an empty file named 'file' of size [size][unit] in [path] using kernel default block size\n");
       printf("[size] must be a valid integer\n");
       printf("[unit] must be a valid data size unit (i.e. b, kb, mb, gb)\n");
-      printf("[bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size. If the input is invalid or 'auto', sfg will use the kernel default bs.\n");
+      printf("[bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size\n");
       printf("If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.\n");
       return 0;
     }
@@ -176,27 +176,23 @@ int main (int argc, char *argv[])
       fprintf (stderr, "Error! Unable to create file!\n");
       return 2;
     }
-
+// Time operation
+  clock_t begin = clock();
 // Fill file with 0
   // Calculate number of iterations
   int iterations = size / bs;
   // Prepare single block
-  char* str="";
-  char* zero ="0";
-
+  char block[bs + 1];
   for (int i = 0; i < bs; i++)
     {
-      char* tmp_str = concat(str, zero);
-      // Very important to avoid mem leaks
-      if (i != 0){free(str);}
-      str = tmp_str;
+      block[i] = '0';
     }
-  // Time operation
-  clock_t begin = clock();
+  block[bs] = '\0';
+
   // Write file
   for (int i = 0; i < iterations; i++)
     {
-      int tmp_check = fputs(str, of);
+      int tmp_check = fputs(block, of);
       if (tmp_check == EOF)
 	{
 	  fprintf (stderr, "Error while writing file! Operation aborted!\n");
@@ -210,7 +206,6 @@ int main (int argc, char *argv[])
   // Free heap memory
   free(tmp);
   free(fname);
-  free(str);
   // Done
   printf ("All done!\n");
   float mod = 1.00;
@@ -234,7 +229,7 @@ int rek_mkdir (char *path)
       rek_mkdir (path);
       *sep = '/';
     }
-  if (mkdir (path, 0755) && errno != EEXIST)
+  if (mkdir (path, 0777) && errno != EEXIST)
     {
       printf("Error while trying to create '%s'! Do i have sufficient permission?\n Is a '.' missing at the beginning of [path]?\n Is '~' at the beginning of [path]?\n", path);
       exit(1);
