@@ -28,7 +28,7 @@
 
 // Function placeholders
 int rek_mkdir (char *path);
-int bs_calculate (void);
+long long bs_calculate (void);
 bool isNumeric (char *str);
 char* concat(char* s1, char* s2);
 
@@ -56,7 +56,7 @@ int main (int argc, char *argv[])
   // OF path
   char *path = argv[1];
   // OF unit
-  int unit;
+  long long unit;
   if (strcmp (argv[3], "gb") == 0)
     {
       unit = 1000000000;
@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
       return 1;
     }
   // Define OF size
-  int size;
+  long long size;
   if (isNumeric(argv[2]))
   {
     size = atoi(argv[2]) * unit;
@@ -100,7 +100,7 @@ int main (int argc, char *argv[])
     name = "file";
   }
   // Define block size
-  int bs;
+  long long bs;
   if (argc >= 5 && isNumeric(argv[4]) && atoi(argv[4]) != 0)
     {
       bs = atoi(argv[4]);
@@ -108,11 +108,11 @@ int main (int argc, char *argv[])
   else
     {
       bs = bs_calculate();
-      printf("Using automatic bs size (%i b)...\n", bs);
+      printf("Using automatic bs size (%lli b)...\n", bs);
     }
   // Check if bs is smaller than filesize
   if(bs > size){
-    fprintf(stderr, "Error: bs (%i b) is greater than file size (%s %s)!\n", bs, argv[2], argv[3]);
+    fprintf(stderr, "Error: bs (%llii b) is greater than file size (%s %s)!\n", bs, argv[2], argv[3]);
     return 2;
   }
   // Check if directory exists
@@ -180,7 +180,7 @@ int main (int argc, char *argv[])
   clock_t begin = clock();
 // Fill file with 0
   // Calculate number of iterations
-  int iterations = size / bs;
+  long long iterations = size / bs;
   // Prepare single block
   char block[bs + 1];
   for (int i = 0; i < bs; i++)
@@ -215,7 +215,7 @@ int main (int argc, char *argv[])
     mod = 1000.00;
     time_unit = "ms";
   }
-  printf("Wrote %i bytes in %f clocks or %f %s!\n", size, time_spent, (time_spent / CLOCKS_PER_SEC) * mod, time_unit);
+  printf("Wrote %lli bytes in %f clocks or %f %s!\n", size, time_spent, (time_spent / CLOCKS_PER_SEC) * mod, time_unit);
   return 0;
 }
 
@@ -238,7 +238,7 @@ int rek_mkdir (char *path)
 }
 
 // Calculate Kernel defined block size
-int bs_calculate (void)
+long long bs_calculate (void)
 {
   struct stat stats;
 
