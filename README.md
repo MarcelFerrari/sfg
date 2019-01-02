@@ -24,4 +24,5 @@ Linux: ```$ sudo clang sfg.c -o sfg && chmod +x sfg && mv sfg /usr/bin/```<br>
 OS X: ```$ sudo clang sfg.c -o sfg && chmod +x sfg && mv sfg /usr/local/bin/```<br>
 
 __Or simply download the precompiled bin file :D__ <br>
+(You might need to make the bin file executable with ```$ sudo chmod +x sfg-XX-XX-XX```)<br>
 ( ͡° ͜ʖ ͡°)
