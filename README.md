@@ -10,7 +10,7 @@ __sfg [-help] [license] [bs_stat] path=[path] size=[size] unit=[unit] bs=[bs] na
 * [-help]: displays help information
 * [size]: Filesize. Must be a valid integer
 * [unit]: Filesize unit. Must be a valid data size unit (i.e. b, kb, mb, gb)
-* [bs] Blocksize. Must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size. SFG can also determine the kernel default [bs] if the argument 'auto' is passed.
+* [bs]: Blocksize. Must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size. SFG can also determine the kernel default [bs] if the argument 'auto' is passed.
 * If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.
 
 # Installation
