@@ -4,12 +4,14 @@ SFG - Simple File Generator
 SFG is a simple and lightweight application written in C, that allows users to create empty files for benchmarking and/or other purposes.
 
 # Usage
-__sfg [-help] [license] [bs_stat] path=[path] size=[size] unit=[unit] bs=[bs] name=[name]__
+__sfg [license] [-help] [-bs_stat] path=[path] size=[size] unit=[unit] bs=[bs] name=[name]__
 
 ## Note:
-* [-help]: displays help information
-* [size]: Filesize. Must be a valid integer
-* [unit]: Filesize unit. Must be a valid data size unit (i.e. b, kb, mb, gb)
+* [license]: Displays license information.
+* [-help]: Displays help page.
+* [-bs_stat]: Displays kernel default bs.
+* [size]: Filesize. Must be a valid integer.
+* [unit]: Filesize unit. Must be a valid data size unit (i.e. b, kb, mb, gb).
 * [bs]: Blocksize. Must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size. SFG can also determine the kernel default [bs] if the argument 'auto' is passed.
 * If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.
 
