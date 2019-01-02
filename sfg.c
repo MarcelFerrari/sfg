@@ -66,7 +66,7 @@ char* input_args[MAX_ARGS] = {NULL, NULL, NULL, NULL, NULL}; // Maximum of five 
 int main (int argc, char *argv[])
 {
   // License
-  printf("\nCopyright © 2018-2019 Marcel Ferrari\nThis program is free software and comes with ABSOLUTELY NO WARRANTY.\nFor more information type 'license'.\nFor the latest updates check https://github.com/MarcelFerrari/sfg\n\n ");
+  printf("\nCopyright © 2018-2019 Marcel Ferrari\nThis program is free software and comes with ABSOLUTELY NO WARRANTY.\nFor more information type 'license'.\nFor the latest updates see https://github.com/MarcelFerrari/sfg\n\n ");
   // Check flags --> path, size, unit, (bs), (name)
   arg_process(argc, argv);
   // Extract path variable
@@ -103,7 +103,7 @@ int main (int argc, char *argv[])
     {
       fprintf (stderr,
 	       "Unknown unit! Please input 'gb', 'mb', 'kb' or 'b'\n");
-      return 1;
+      exit(1);
     }
   // Check OF size
   long long size = atoi(size_str) * unit;
@@ -134,7 +134,7 @@ int main (int argc, char *argv[])
   // Check if bs is smaller than filesize
   if(bs > size){
     fprintf(stderr, "Error: bs (%llii b) is greater than file size (%s %s)!\n", bs, argv[2], argv[3]);
-    return 2;
+    exit(1);
   }
   // Check if directory exists
   DIR *dir_check = opendir(path);
@@ -173,7 +173,7 @@ int main (int argc, char *argv[])
     {
       //opendir() failed for some other reason
       fprintf (stderr, "Directory check failed! Do i have sufficient permission?\n");
-      return 2;
+      exit(1);
     }
 
 // Check if file exists
@@ -185,7 +185,7 @@ int main (int argc, char *argv[])
   if (access (fname, F_OK) != -1)
     {
       fprintf (stderr, "Unable to create file! File already exists!\n");
-      return 2;
+      exit(1);
     }
   else
     {
@@ -195,7 +195,7 @@ int main (int argc, char *argv[])
   if (of == NULL)
     {
       fprintf (stderr, "Error! Unable to create file!\n");
-      return 2;
+      exit(1);
     }
 // Time operation
   clock_t begin = clock();
@@ -236,7 +236,7 @@ int main (int argc, char *argv[])
     mod = 1000.00;
     time_unit = "ms";
   }
-  printf("------------------------------------------------\n%f %s written\nsystem time: %f clocks\nreal time: %f %s\naverage writing speed: %fmb/s\n------------------------------------------------\n", (double)(bs * iterations) / unit, unit_str, time_spent, (time_spent / CLOCKS_PER_SEC) * mod, time_unit, (double)((bs * iterations)/(1048576))/(time_spent / CLOCKS_PER_SEC));
+  printf("------------------------------------------------\n%f %s written\nsystem time: %f clocks\nreal time: %f %s\naverage writing speed: %fmb/s\n------------------------------------------------\n\n( ͡° ͜ʖ ͡°)\n\n", (double)(bs * iterations) / unit, unit_str, time_spent, (time_spent / CLOCKS_PER_SEC) * mod, time_unit, (double)((bs * iterations)/(1048576))/(time_spent / CLOCKS_PER_SEC));
   return 0;
 }
 
@@ -289,7 +289,7 @@ void arg_process(int argc, char* argv[])
       input_args[NAME_INDEX] = argv[i] + NAME_LENGTH;
     }
     else if (strcmp(argv[i], HELP) == 0) {
-      printf("HALP\n");
+      printf("#Usage\n\nsfg [license] [-help] [-bs_stat] path=[path] size=[size] unit=[unit] bs=[bs] name=[name]\n\n## Note:\n* [license]: Displays license information.\n* [-help]: Displays help page.\n* [-bs_stat]: Displays system I/O default bs.\n* [size]: Filesize. Must be a valid integer.\n* [unit]: Filesize unit. Must be a valid data size unit (i.e. b, kb, mb, gb).\n* [bs]: Blocksize. Must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size. SFG can also determine the system I/O [bs] if the argument 'auto' is passed. \n* If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.\n\n For more information see https://github.com/MarcelFerrari/sfg\n\n");
       exit(0);
     }
     else if(strcmp(argv[i], LICENSE) == 0){
@@ -297,7 +297,7 @@ void arg_process(int argc, char* argv[])
       exit(0);
     }
     else if (strcmp(argv[i], BS_STAT) == 0) {
-      printf("Block size for system I/O is %llib\n", bs_calculate());
+      printf("Default block size for system I/O is %llib\n\n", bs_calculate());
       exit(0);
     }
   }
@@ -316,7 +316,7 @@ long long bs_calculate (void)
   else
     {
       fprintf (stderr, "Error while determining automatic bs!");
-      exit(3);
+      exit(1);
     }
 }
 
