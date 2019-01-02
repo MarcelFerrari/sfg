@@ -1,19 +1,19 @@
+
 /*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright © 2018 Marcel Ferrari
 */
+// Standard header files
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,51 +25,77 @@
 #include <stdbool.h>
 #include <time.h>
 
+// Define arbitrary values
+#define MAX_ARGS 5
 
-// Function placeholders
+#define LICENSE "license"
+#define HELP "-help"
+#define BS_STAT "-bs_stat"
+
+#define PATH_LENGTH 5
+#define PATH_ARG "path="
+#define PATH_INDEX 0
+
+#define SIZE_LENGTH 5
+#define SIZE_ARG "size="
+#define SIZE_INDEX 1
+
+#define UNIT_LENGTH 5
+#define UNIT_ARG "unit="
+#define UNIT_INDEX 2
+
+#define BS_LENGTH 3
+#define BS_ARG "bs="
+#define BS_INDEX 3
+
+#define NAME_LENGTH 5
+#define NAME_ARG "name="
+#define NAME_INDEX 4
+
+// Function prototypes
+void arg_process(int argc, char* argv[]);
 int rek_mkdir (char *path);
 long long bs_calculate (void);
 bool isNumeric (char *str);
 char* concat(char* s1, char* s2);
 
+// Define global variables
+char* input_args[MAX_ARGS] = {NULL, NULL, NULL, NULL, NULL}; // Maximum of five arguments (path, size, unit, bs, name)
+
+
 int main (int argc, char *argv[])
 {
+  // License
+  printf("\nCopyright © 2018-2019 Marcel Ferrari\nThis program is free software and comes with ABSOLUTELY NO WARRANTY.\nFor more information type 'license'.\nFor the latest updates check https://github.com/MarcelFerrari/sfg\n\n ");
   // Check flags --> path, size, unit, (bs), (name)
-  // Too few or many arguments
-  if (argc != 2 && (argc < 4 || argc > 6))
-    {
-      fprintf (stderr, "Usage: sfg [path] [size] [unit] [bs] [filename]\n");
-      return 1;
-    }
-  else if (argc == 2 && strcmp (argv[1], "--help") == 0)
-    {
-      printf ("Usage: sfg [path] [size] [unit] [bs] [filename] --> Writes an empty file named [name] of size [size][unit] in [path] using block size [bs]\n");
-      printf("or sfg [path] [size] [unit] [bs] --> Writes an empty file named 'file' of size [size][unit] in [path] using block size [bs]\n");
-      printf("or sfg [path] [size] [unit] --> Writes an empty file named 'file' of size [size][unit] in [path] using kernel default block size\n");
-      printf("[size] must be a valid integer\n");
-      printf("[unit] must be a valid data size unit (i.e. b, kb, mb, gb)\n");
-      printf("[bs] must be a valid integer. [bs] is always expressed in bytes (b) and must be smaller than the total file size\n");
-      printf("If a directory does not exist, sfg can create it (0755). If a file already exists, sfg will not overwrite it.\n");
-      return 0;
-    }
-  // Define useful variables
-  // OF path
-  char *path = argv[1];
+  arg_process(argc, argv);
+  // Extract path variable
+  char* path = input_args[PATH_INDEX];
+  char* size_str = input_args[SIZE_INDEX];
+  char* unit_str = input_args[UNIT_INDEX];
+  char* bs_str = input_args[BS_INDEX];
+  char* name = input_args[NAME_INDEX];
+  // Check for all needed values
+  if (path == NULL || size_str == NULL || unit_str == NULL || bs_str == NULL) {
+      fprintf (stderr, "Usage: sfg path='path' size='size' unit='unit' bs='block_size' name='filename' [bs_stat]\nor sfg -help\n");
+      exit(0);
+  }
+  // Process numeric variables
   // OF unit
   long long unit;
-  if (strcmp (argv[3], "gb") == 0)
+  if (strcmp(unit_str, "gb") == 0)
     {
       unit = 1000000000;
     }
-  else if (strcmp (argv[3], "mb") == 0)
+  else if (strcmp(unit_str, "mb") == 0)
     {
       unit = 1000000;
     }
-  else if (strcmp (argv[3], "kb") == 0)
+  else if (strcmp(unit_str, "kb") == 0)
     {
       unit = 1000;
     }
-  else if (strcmp (argv[3], "b") == 0)
+  else if (strcmp(unit_str, "b") == 0)
     {
       unit = 1;
     }
@@ -79,44 +105,39 @@ int main (int argc, char *argv[])
 	       "Unknown unit! Please input 'gb', 'mb', 'kb' or 'b'\n");
       return 1;
     }
-  // Define OF size
-  long long size;
-  if (isNumeric(argv[2]))
-  {
-    size = atoi(argv[2]) * unit;
+  // Check OF size
+  long long size = atoi(size_str) * unit;
+  if (size <= 0){
+    size = atoi(size_str) * unit;
+    fprintf(stderr, "Error: size cannot be neither 0 nor negative!\n");
+    exit(1);
   }
-  else
-  {
-    fprintf(stderr, "Please input a valid integer for size!");
+
+  // Check OF name
+  if (name == NULL)
+    {
+      name = "file";
+    }
+
+  // Check block size
+  long long bs = atoi(bs_str);
+  if (strcmp("auto", bs_str) == 0) {
+    bs = bs_calculate();
+    printf("Using automatic bs size (%llib)...\n", bs);
   }
-  // (Define OF name)
-  char *name;
-  if (argc == 6)
+  else if (bs <= 0)
     {
-      name = argv[5];
+      fprintf(stderr, "Invalid bs size %s\n", bs_str);
+      exit(1);
     }
-  else
-    {
-    name = "file";
-  }
-  // Define block size
-  long long bs;
-  if (argc >= 5 && isNumeric(argv[4]) && atoi(argv[4]) != 0)
-    {
-      bs = atoi(argv[4]);
-    }
-  else
-    {
-      bs = bs_calculate();
-      printf("Using automatic bs size (%lli b)...\n", bs);
-    }
+
   // Check if bs is smaller than filesize
   if(bs > size){
     fprintf(stderr, "Error: bs (%llii b) is greater than file size (%s %s)!\n", bs, argv[2], argv[3]);
     return 2;
   }
   // Check if directory exists
-  DIR *dir_check = opendir (path);
+  DIR *dir_check = opendir(path);
   if (dir_check)
     {
       // Directory exists
@@ -131,7 +152,7 @@ int main (int argc, char *argv[])
       // Input validation
       do
 	{
-	  check = tolower (getchar ());
+	  check = tolower(getchar ());
 	}
       while (strcmp (&check, "y") != 0 && strcmp (&check, "n") != 0);
       // Handle input
@@ -207,7 +228,7 @@ int main (int argc, char *argv[])
   free(tmp);
   free(fname);
   // Done
-  printf ("All done!\n");
+  printf("All done!\n");
   float mod = 1.00;
   char* time_unit = "seconds";
   if (time_spent / CLOCKS_PER_SEC <= 0.01)
@@ -215,7 +236,7 @@ int main (int argc, char *argv[])
     mod = 1000.00;
     time_unit = "ms";
   }
-  printf("Wrote %lli bytes in %f clocks or %f %s!\n", size, time_spent, (time_spent / CLOCKS_PER_SEC) * mod, time_unit);
+  printf("------------------------------------------------\n%f %s written\nsystem time: %f clocks\nreal time: %f %s\naverage writing speed: %fmb/s\n------------------------------------------------\n", (double)(bs * iterations) / unit, unit_str, time_spent, (time_spent / CLOCKS_PER_SEC) * mod, time_unit, (double)((bs * iterations)/(1048576))/(time_spent / CLOCKS_PER_SEC));
   return 0;
 }
 
@@ -237,7 +258,53 @@ int rek_mkdir (char *path)
   return 0;
 }
 
-// Calculate Kernel defined block size
+// Handle command line arguments
+void arg_process(int argc, char* argv[])
+{
+  // Check argv
+  for (int i = 1; i < argc; i++) {
+    // Path ("path=" must be a substring of argv[i], input_args[PATH_INDEX] must still be empty and length of argv[i] must be > PATH_LENGTH)
+    if (strstr(argv[i], PATH_ARG) != NULL && input_args[PATH_INDEX] == NULL && strlen(argv[i]) > PATH_LENGTH) {
+      // store value at specific index
+      input_args[PATH_INDEX] = argv[i] + PATH_LENGTH;
+    }
+    // Size
+    else if (strstr(argv[i], SIZE_ARG) != NULL && input_args[SIZE_INDEX] == NULL && strlen(argv[i]) > SIZE_LENGTH && isNumeric(argv[i] + SIZE_LENGTH)) {
+      // store value at specific index
+      input_args[SIZE_INDEX] = argv[i] + SIZE_LENGTH;
+    }
+    // Unit
+    else if (strstr(argv[i], UNIT_ARG) != NULL && input_args[UNIT_INDEX] == NULL && strlen(argv[i]) > UNIT_LENGTH) {
+      // store value at specific index
+      input_args[UNIT_INDEX] = argv[i] + UNIT_LENGTH;
+    }
+    // Bs
+    else if (strstr(argv[i], BS_ARG) != NULL && input_args[BS_INDEX] == NULL && strlen(argv[i]) > BS_LENGTH && (isNumeric(argv[i] + BS_LENGTH) || strcmp("auto", argv[i] + BS_LENGTH) == 0)) {
+      // store value at specific index
+      input_args[BS_INDEX] = argv[i] + BS_LENGTH;
+    }
+    // Name
+    else if (strstr(argv[i], NAME_ARG) != NULL && input_args[NAME_INDEX] == NULL && strlen(argv[i]) > NAME_LENGTH) {
+      // store value at specific index
+      input_args[NAME_INDEX] = argv[i] + NAME_LENGTH;
+    }
+    else if (strcmp(argv[i], HELP) == 0) {
+      printf("HALP\n");
+      exit(0);
+    }
+    else if(strcmp(argv[i], LICENSE) == 0){
+      printf("This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n GNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program. If not, see <http://www.gnu.org/licenses/>.\n");
+      exit(0);
+    }
+    else if (strcmp(argv[i], BS_STAT) == 0) {
+      printf("Block size for system I/O is %llib\n", bs_calculate());
+      exit(0);
+    }
+  }
+}
+
+
+// Calculate block size for system I/O
 long long bs_calculate (void)
 {
   struct stat stats;
@@ -253,6 +320,7 @@ long long bs_calculate (void)
     }
 }
 
+
 // Check if string is numeric
 bool isNumeric (char *str)
 {
@@ -266,6 +334,7 @@ bool isNumeric (char *str)
     }
   return true;
 }
+
 
 // Concatenate 2 strings
 char* concat(char* s1, char* s2)
