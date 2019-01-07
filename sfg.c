@@ -245,7 +245,7 @@ int main (int argc, char *argv[])
   float real_mod = 1.00;
   char* cpu_time_unit = "seconds";
   char* real_time_unit = "seconds";
-  long long bytes_written = bs * iterations;
+  long double bytes_written = bs * iterations;
   // Adjust time unit
   if (cpu_time / CLOCKS_PER_SEC <= 0.01)
   {
