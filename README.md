@@ -18,8 +18,7 @@ __sfg [license] [-help] [-bs_stat] path=[path] size=[size] unit=[unit] bs=[bs] n
 # Installation
 To install SFG simply download the source code (either by cloning this repo or as zip)<br/>
 ```$ git clone https://github.com/MarcelFerrari/sfg```<br>
-Compile it using clang and install it to /usr/bin for linux users or /usr/local/bin for OS X users
-And move it to /usr/bin/ for Linux or /usr/local/bin/ for OS X users<br>
+CD into the directory, compile it using clang/gcc and install it to /usr/bin on linux or /usr/local/bin for OS X<br>
 Linux: ```$ sudo clang sfg.c -o sfg && chmod +x sfg && mv sfg /usr/bin/```<br>
 OS X: ```$ sudo clang sfg.c -o sfg && chmod +x sfg && mv sfg /usr/local/bin/```<br>
 
