@@ -23,10 +23,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <sys/time.h>
 #include <time.h>
 
 // Define arbitrary values
 #define MAX_ARGS 5
+
+#define MB 1048576
 
 #define LICENSE "license"
 #define HELP "-help"
@@ -198,7 +201,9 @@ int main (int argc, char *argv[])
       exit(1);
     }
 // Time operation
-  clock_t begin = clock();
+  clock_t cpu_time_start = clock();
+  struct timeval real_time_start;
+  gettimeofday(&real_time_start, NULL);
 // Fill file with 0
   // Calculate number of iterations
   long long iterations = size / bs;
@@ -209,7 +214,6 @@ int main (int argc, char *argv[])
       block[i] = '0';
     }
   block[bs] = '\0';
-
   // Write file
   for (int i = 0; i < iterations; i++)
     {
@@ -221,22 +225,39 @@ int main (int argc, char *argv[])
 	}
     }
   // Done writing
-  clock_t end = clock();
-  double time_spent = (double)(end - begin);
+  // End timer
+  clock_t cpu_time_end = clock();
+  struct timeval real_time_end;
+  gettimeofday(&real_time_end, NULL);
+  double cpu_time = (double)(cpu_time_end - cpu_time_start);
+  double real_time_seconds = (double)(real_time_end.tv_sec - real_time_start.tv_sec);
+  double real_time_micros = (double)(real_time_end.tv_usec - real_time_start.tv_usec);
+  double real_time = (double)(real_time_seconds + real_time_micros/1000000);
+
+  // Close file
   fclose (of);
   // Free heap memory
   free(tmp);
   free(fname);
   // Done
   printf("All done!\n");
-  float mod = 1.00;
-  char* time_unit = "seconds";
-  if (time_spent / CLOCKS_PER_SEC <= 0.01)
+  float cpu_mod = 1.00;
+  float real_mod = 1.00;
+  char* cpu_time_unit = "seconds";
+  char* real_time_unit = "seconds";
+  long long bytes_written = bs * iterations;
+  // Adjust time unit
+  if (cpu_time / CLOCKS_PER_SEC <= 0.01)
   {
-    mod = 1000.00;
-    time_unit = "ms";
+    cpu_mod = 1000.00;
+    cpu_time_unit = "ms";
   }
-  printf("------------------------------------------------\n%f %s written\nsystem time: %f clocks\nreal time: %f %s\naverage writing speed: %fmb/s\n------------------------------------------------\n\n( ͡° ͜ʖ ͡°)\n\n", (double)(bs * iterations) / unit, unit_str, time_spent, (time_spent / CLOCKS_PER_SEC) * mod, time_unit, (double)((bs * iterations)/(1048576))/(time_spent / CLOCKS_PER_SEC));
+  if (real_time <= 0.01)
+  {
+    real_mod = 1000.00;
+    real_time_unit = "ms";
+  }
+  printf("------------------------------------------------\n%Lf %s written\ntotal CPU time: %f clocks or %Lf %s\nreal time: %f %s\naverage writing speed: %Lfmb/s\n------------------------------------------------\n\n", (long double)(bytes_written / unit), unit_str, cpu_time, (long double)(cpu_time / CLOCKS_PER_SEC) * cpu_mod, cpu_time_unit, real_time * real_mod,real_time_unit,(long double)(((bytes_written)/(MB))/real_time));
   return 0;
 }
 
